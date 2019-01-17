@@ -1,0 +1,31 @@
+# -*- coding:utf-8-*-
+#+TITLE: D.2 Key Binding Conventions
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+
+* D.2 Key Binding Conventions
+  + 许多特殊的主要模式，如 Dired，Info，Compilation 和 Occur，旨在处理包含超链接的只读文本。这种主要模式应重新定义 =mouse-2= 和 =<RET>= 以跟随链接。它还应该设置一个 =follow-link= 条件，以便链接遵守 mouse-1-click-follow-link。请参阅[[http://www.gnu.org/software/emacs/manual/html_node/elisp/Clickable-Text.html#Clickable-Text][Clickable Text]] and [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Buttons.html#Buttons][Buttons]]，以获得实现此类可点击链接的简便方法。
+
+  + Lisp 程序中不要将 *C-c letter* 定义为键。由 *C-c letter* （大写或小写）保留给用户; 它们是为用户保留的唯一序列，因此请勿阻止它们。
+
+    改变所有 Emacs 主要模式以遵守这个惯例需要很多工作; 放弃这个惯例会使这项工作变得浪费，并给用户带来不便。所以请遵守它。
+
+  + 不带修饰键的 <F5> 到 <F9> 也保留供用户定义。
+
+  + 由 *C-c 控制字符或数字* 的序列为 major mode 保留。
+
+  + 由 *C-c 后跟 {，}，<，>，：或;* 组成的序列也为 major mode 保留。
+
+  + 由 *C-c 后跟任何其他 ASCII 标点符号或符号字符* 组成的序列为 minor mode 保留。并非绝对禁止在 major mode 下使用它们，但如果这样做，major mode 的绑定偶尔可能会被 minor mode 覆盖。
+
+  + 不要将 *C-h 后跟任何前缀字符* （包括 C-c）绑定 。如果不绑定 C-h，它将作为列出前缀字符的子命令的帮助字符。
+
+  + 除跟随另一个 *<ESC>* 之外，不要绑定以 *<ESC>* 结尾的键序列。（也就是说，可以绑定以 *<ESC><ESC>* 结尾的序列。）
+
+    此规则的原因是在任何上下文中 *<ESC>* 的非前缀绑定都会阻止将转义序列识别为该上下文中的函数键。
+
+  + 类似地，不要绑定以 C-g 结尾的键序列，因为它通常用于取消键序列。
+
+  + 任何表现为用户可以进入和离开的临时模式或状态的东西都应该定义 *<ESC><ESC>* 或  *<ESC><ESC><ESC>*  作为退出方式。
+
+    对于接受普通 Emacs 命令的状态，或者更一般地说任何类型的状态，其中 *<ESC> 后跟一个功能键或箭头键* 可能有意义，那么不能定义 *<ESC> <ESC>* ，因为这样就不能识别 *<ESC>* 之后的转义序列。在这些状态中，应该将  *<ESC><ESC><ESC>*  定义为转义方式。否则，请改为定义 *<ESC> <ESC>* 。

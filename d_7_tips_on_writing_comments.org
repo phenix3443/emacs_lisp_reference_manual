@@ -1,0 +1,73 @@
+# -*- coding:utf-8-*-
+#+TITLE: D.7 Tips on Writing Comments
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+#+STARTUP: overview
+#+OPTIONS: num:nil
+
+* D.7 Tips on Writing Comments
+  We recommend these conventions for comments:
+
+  建议这些约定用于评论：
+  + ‘;’
+
+    Comments that start with a single semicolon, ‘;’, should all be aligned to the same column on the right of the source code. Such comments usually explain how the code on that line does its job. For example:
+
+    以单个分号 “;” 开头的注释应全部与源代码右侧的同一列对齐。这些评论通常解释了该行代码如何完成其​​工作。例如：
+
+    #+BEGIN_SRC elisp
+(setq base-version-list                 ; There was a base
+      (assoc (substring fn 0 start-vn)  ; version to which
+             file-version-assoc-list))  ; this looks like
+                                        ; a subversion.
+    #+END_SRC
+
+  + ‘;;’
+
+    Comments that start with two semicolons, ‘;;’, should be aligned to the same level of indentation as the code. Such comments usually describe the purpose of the following lines or the state of the program at that point. For example:
+
+    以两个分号 “;;” 开头的注释应与代码的缩进级别对齐。这些评论通常描述以下行的目的或当时程序的状态。例如：
+    #+BEGIN_SRC elisp
+(prog1 (setq auto-fill-function
+             ...
+             ...
+             ;; Update mode line.
+             (force-mode-line-update)))
+    #+END_SRC
+
+    We also normally use two semicolons for comments outside functions.
+
+    我们通常还使用两个分号来表示函数之外的注释。
+
+    #+BEGIN_SRC elisp
+;; This Lisp code is run in Emacs when it is to operate as
+;; a server for other processes.
+    #+END_SRC
+
+    If a function has no documentation string, it should instead have a two-semicolon comment right before the function, explaining what the function does and how to call it properly. Explain precisely what each argument means and how the function interprets its possible values. It is much better to convert such comments to documentation strings, though.
+
+    如果一个函数没有文档字符串，它应该在函数之前有一个双分号注释，解释函数的作用以及如何正确调用它。准确解释每个参数的含义以及函数如何解释其可能的值。不过，将这些注释转换为文档字符串要好得多。
+
+  + ‘;;;’
+
+    Comments that start with three semicolons, ‘;;;’, should start at the left margin. We use them for comments which should be considered a heading by Outline minor mode. By default, comments starting with at least three semicolons (followed by a single space and a non-whitespace character) are considered headings, comments starting with two or fewer are not. Historically, triple-semicolon comments have also been used for commenting out lines within a function, but this use is discouraged.
+
+    以三个分号开头的注释';;;'应从左边距开始。我们将它们用于评论，这些注释应被视为 Outline minor mode 的标题。默认情况下，以至少三个分号（后跟单个空格和非空白字符）开头的注释被视为标题，以两个或更少开头的注释不是。从历史上看，三分号注释也用于注释函数中的行，但不建议使用这种注释。
+
+    When commenting out entire functions, use two semicolons.
+
+    注释掉整个函数时，请使用两个分号。
+
+  + ‘;;;;’
+
+    Comments that start with four semicolons, ‘;;;;’, should be aligned to the left margin and are used for headings of major sections of a program. For example:
+
+    以四个分号开头的注释';;;;'应与左边距对齐，并用于程序主要部分的标题。例如：
+
+    #+BEGIN_SRC elisp
+          ;;;; The kill ring
+    #+END_SRC
+
+    Generally speaking, the M-; (comment-dwim) command automatically starts a comment of the appropriate type; or indents an existing comment to the right place, depending on the number of semicolons. See [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Comments.html#Comments][Manipulating Comments]] .
+
+    一般来说， =M-; (comment-dwim)= 命令自动启动相应类型的注释; 或者将现有注释缩进到正确的位置，具体取决于分号的数量。请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Comments.html#Comments][Manipulating Comments]] 。
