@@ -1,0 +1,418 @@
+# -*- coding:utf-8-*-
+#+TITLE: 1. Introduction
+#+AUTHOR: liushangliang
+#+EMAIL: phenix3443+github@gmail.com
+#+STARTUP: overview
+#+OPTIONS: num:nil
+
+* 1 Introduction
+  Most of the GNU Emacs text editor is written in the programming language called Emacs Lisp. You can write new code in Emacs Lisp and install it as an extension to the editor. However, Emacs Lisp is more than a mere “extension language”; it is a full computer programming language in its own right. You can use it as you would any other programming language.
+
+  GNU Emacs 文本编辑器大多数代码都是用称为 Emacs Lisp 的编程语言编写的。可以在 Emacs Lisp 中编写新代码并将其安装为编辑器的扩展。然而，Emacs Lisp 不仅仅是一种扩展语言; 它本身就是一种完整的计算机编程语言。可以像使用任何其他编程语言一样使用它。
+
+  Because Emacs Lisp is designed for use in an editor, it has special features for scanning and parsing text as well as features for handling files, buffers, displays, subprocesses, and so on. Emacs Lisp is closely integrated with the editing facilities; thus, editing commands are functions that can also conveniently be called from Lisp programs, and parameters for customization are ordinary Lisp variables.
+
+  由于 Emacs Lisp 设计用于编辑器，因此它具有用于扫描和解析文本的特殊功能，以及用于处理文件，缓冲区，显示，子进程等的功能。Emacs Lisp 与编辑功能紧密集成; 因此，编辑命令是可以方便地从 Lisp 程序调用的函数，而自定义的参数是普通的 Lisp 变量。
+
+  This manual attempts to be a full description of Emacs Lisp. For a beginner's introduction to Emacs Lisp, see An Introduction to Emacs Lisp Programming, by Bob Chassell, also published by the Free Software Foundation. This manual presumes considerable familiarity with the use of Emacs for editing; see The GNU Emacs Manual for this basic information.
+
+  本手册试图完整地描述 Emacs Lisp。由 Bob Chassell 编著、自由软件基金会出版的 “Emacs Lisp 编程入门” 可作为 Emacs Lisp 的初学者入门教程。
+
+  Generally speaking, the earlier chapters describe features of Emacs Lisp that have counterparts in many programming languages, and later chapters describe features that are peculiar to Emacs Lisp or relate specifically to editing.
+
+  一般来说，前面的章节描述了 Emacs Lisp 中与其他许多编程语言共有的特性，后面的章节描述了 Emacs Lisp 特有或者与编辑相关的特性。
+
+  This is the GNU Emacs Lisp Reference Manual, corresponding to Emacs version 26.1.
+
+  这是 GNU Emacs Lisp 参考手册，对应于 Emacs 版本 26.1。
+
+  + Caveats: Flaws and a request for help.
+
+    警告：缺陷和请求帮助。
+
+  + Lisp History: Emacs Lisp is descended from Maclisp.
+
+    Lisp 历史：Emacs Lisp 是 Maclisp 的后裔。
+
+  + Conventions: How the manual is formatted.
+
+    约定：手册如何编排。
+
+  + Version Info: Which Emacs version is running?
+
+    版本信息：正在运行哪个 Emacs 版本？
+
+  + Acknowledgments: The authors, editors, and sponsors of this manual.
+
+    致谢：本手册的作者，编辑和赞助商。
+
+** 1.1 Caveats
+
+   This manual has gone through numerous drafts. It is nearly complete but not flawless. There are a few topics that are not covered, either because we consider them secondary (such as most of the individual modes) or because they are yet to be written. Because we are not able to deal with them completely, we have left out several parts intentionally.
+
+   本手册经历多次修改。它几乎完整但不完美。有一些主题未被涵盖，要么因为我们认为它们是次要的（例如大多数单独模式），或者因为它们尚未被编写。因为我们无法完全处理它们，所以我们故意省略了几个部分。
+
+   The manual should be fully correct in what it does cover, and it is therefore open to criticism on anything it says—from specific examples and descriptive text, to the ordering of chapters and sections. If something is confusing, or you find that you have to look at the sources or experiment to learn something not covered in the manual, then perhaps the manual should be fixed. Please let us know.
+
+   手册所涵盖的内容应该是完全正确的，因此可以批评它所说的任何内容 - 从具体的例子和描述性文本，到章节和章节的顺序。如果某些内容令人困惑，或者您发现必须查看源码或尝试实验来学习手册中未涵盖的内容，那么可能需要修复手册。请告诉我们。
+
+   As you use this manual, we ask that you send corrections as soon as you find them. If you think of a simple, real life example for a function or group of functions, please make an effort to write it up and send it in. Please reference any comments to the node name and function or variable name, as appropriate. Also state the number of the edition you are criticizing.
+
+   在使用本手册时，我们会请求您在找到更正后立即发送。如果您想到函数或函数组的简单真实的生活示例，麻烦尝试编写并发送给我们。请根据需要指明评论所对应的章节、函数或者变量名字，还有版本编号。
+
+   Please send comments and corrections using M-x report-emacs-bug.
+
+   请使用 =M-x report-emacs-bug= 将意见和更正发送给我们。
+
+** 1.2 Lisp History
+
+   Lisp (LISt Processing language) was first developed in the late 1950s at the Massachusetts Institute of Technology for research in artificial intelligence. The great power of the Lisp language makes it ideal for other purposes as well, such as writing editing commands.
+
+   Lisp（列表处理语言）是在 20 世纪五十年代晚期在麻省理工学院开发的，主要用于研究人工智能。Lisp 语言的强大功能使之成为其他目的的理想选择，比如编写编辑器命令。
+
+   Dozens of Lisp implementations have been built over the years, each with its own idiosyncrasies. Many of them were inspired by Maclisp, which was written in the 1960s at MIT's Project MAC. Eventually the implementors of the descendants of Maclisp came together and developed a standard for Lisp systems, called Common Lisp. In the meantime, Gerry Sussman and Guy Steele at MIT developed a simplified but very powerful dialect of Lisp, called Scheme.
+
+   多年来已经构建了数十个 Lisp 实现，每个实现都有自己的特性。它们中很多都是受到了 Maclisp 的启发，后者于 20 世纪 60 年代在麻省理工学院的 MAC 项目中撰写。最终，Maclisp 后代的实现者聚集在一起，为 Lisp 系统开发了一个名为 Common Lisp 的标准。与此同时，麻省理工学院的 Gerry Sussman 和 Guy Steele 开发了一种简化但非常强大的 Lisp 方言，称为 Scheme。
+
+   GNU Emacs Lisp is largely inspired by Maclisp, and a little by Common Lisp. If you know Common Lisp, you will notice many similarities. However, many features of Common Lisp have been omitted or simplified in order to reduce the memory requirements of GNU Emacs. Sometimes the simplifications are so drastic that a Common Lisp user might be very confused. We will occasionally point out how GNU Emacs Lisp differs from Common Lisp. If you don't know Common Lisp, don't worry about it; this manual is self-contained.
+
+   GNU Emacs Lisp 很大程度上受到 Maclisp 的启发，少部分受到 Common Lisp 的启发。如果了解 Common Lisp，您会发现许多相似之处。但是，为了减少 GNU Emacs 的内存需求，已经省略或简化了 Common Lisp 的许多功能。有时简化是如此激烈，以至于 Common Lisp 用户可能会非常困惑。我们偶尔会指出 GNU Emacs Lisp 与 Common Lisp 的区别。如果您不了解 Common Lisp，请不要担心; 本手册是独立的。
+
+   A certain amount of Common Lisp emulation is available via the cl library. see [[https://www.gnu.org/software/emacs/manual/html_node/cl/index.html#Top][Overview]] .
+
+   cl-lib 库提供大量的 Common Lisp 仿真。请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/cl/index.html#Top][Overview]] 。
+
+   Emacs Lisp is not at all influenced by Scheme; but the GNU project has an implementation of Scheme, called Guile. We use Guile in all new GNU software that calls for extensibility.
+
+   Emacs Lisp 完全不受 Scheme 的影响; 但 GNU 项目有一个 Scheme 的实现，称为 Guile。我们在所有需要可扩展性的新 GNU 软件中使用它。
+
+** 1.3 Conventions（约定）
+
+   This section explains the notational conventions that are used in this manual. You may want to skip this section and refer back to it later.
+
+   本节介绍本手册中使用的符号约定。您可能希望跳过此部分，稍后再参考它。
+
+   + Some Terms: Explanation of terms we use in this manual.
+
+     一些术语：在本手册中使用的术语解释。
+
+   + nil and t: How the symbols nil and t are used.
+
+     nil 和 t：如何使用符号 nil 和 t。
+
+   + Evaluation Notation: The format we use for examples of evaluation.
+
+     求值说明：求值示例使用的格式。
+
+   + Printing Notation: The format we use when examples print text.
+
+     打印说明：示例打印文本时使用的格式。
+
+   + Error Messages: The format we use for examples of errors.
+
+     错误消息：错误示例使用的格式。
+
+   + Buffer Text Notation: The format we use for buffer contents in examples.
+
+     缓冲区文本说明：示例中缓冲区内容使用的格式。
+
+   + Format of Descriptions: Notation for describing functions, variables, etc.
+
+     描述格式：用于描述函数，变量等的说明。
+
+*** 1.3.1 Some Terms（一些术语）
+    Throughout this manual, the phrases “the Lisp reader” and “the Lisp printer” refer to those routines in Lisp that convert textual representations of Lisp objects into actual Lisp objects, and vice versa. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Printed-Representation.html#Printed-Representation][printed representation]] , for more details. you, the person reading this manual, are thought of as “the programmer” and are addressed as “you.” “the user” is the person who uses lisp programs, including those you write.
+
+    本手册中，“the Lisp reader” 和 “Lisp printer” 是指 Lisp 代码中将 Lisp 对象的文本表示转换为实际 Lisp 对象的例程，反之亦然。详见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Printed-Representation.html#Printed-Representation][printed representation]] 。 阅读本手册的人，被认为是程序员，并被称为 “您”。 用户是使用 Lisp 程序（包括您编写的程序）的人。
+
+    Examples of Lisp code are formatted like this: (list 1 2 3). Names that represent metasyntactic variables, or arguments to a function being described, are formatted like this: first-number.
+
+    Lisp 示例代码格式： =(list 1 2 3)= 。表示元语法变量，函数的参数的名字的格式如下： /first-number/ 。
+
+*** 1.3.2 nil and t
+
+    In Lisp, the symbol nil has three separate meanings: it is a symbol with the name ‘nil’; it is the logical truth value false; and it is the empty list—the list of zero elements. When used as a variable, nil always has the value nil.
+
+    Lisp 中，符号 nil 有三个不同的含义：它是一个名为'nil'的符号; 布尔值假; 元素个数为零的空列表。 当用作变量时，nil 值始终是 nil。
+
+    As far as the Lisp reader is concerned, ‘()’ and ‘nil’ are identical: they stand for the same object, the symbol nil. The different ways of writing the symbol are intended entirely for human readers. After the Lisp reader has read either ‘()’ or ‘nil’, there is no way to determine which representation was actually written by the programmer.
+
+    对于 Lisp reader 而言， =()= 和 =nil= 等价：它们代表相同的对象-符号 nil。编写符号的不同方式完全是为了人类读者。 在 Lisp reader 读取 =()= 或 =nil= 之后，无法确定程序员实际编写的表示形式。
+
+    In this manual, we write () when we wish to emphasize that it means the empty list, and we write nil when we wish to emphasize that it means the truth value false. That is a good convention to use in Lisp programs also.
+
+    在本手册中，当希望强调它表示空列表时写 =()= ,当希望强调它意味着真值是错误时写做 =nil= 。 这也是在 Lisp 程序中使用的一个很好的约定。
+
+    #+BEGIN_SRC elisp
+(cons 'foo ())                ; 强调空列表
+(setq foo-flag nil)           ; 强调布尔值为假
+    #+END_SRC
+
+    In contexts where a truth value is expected, any non-nil value is considered to be true. However, t is the preferred way to represent the truth value true. When you need to choose a value which represents true, and there is no other basis for choosing, use t. The symbol t always has the value t.
+
+    在期望真值的情况下，任何 non-nil 都被认为是真。 但是，t 是表示真值 true 的首选方法。 当需要选择表示 true 的值，并且没有其他选择依据时，请使用 t。 符号 t 的值始终为 t。
+
+    In Emacs Lisp, nil and t are special symbols that always evaluate to themselves. This is so that you do not need to quote them to use them as constants in a program. An attempt to change their values results in a setting-constant error. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Constant-Variables.html#Constant-Variables][Constant Variables]] .
+
+    Emacs Lisp 中，nil 和 t 是特殊符号，求值始终等于自身。 这意味着在程序中将它们用作常量的时候不需要 quote 它们。 尝试更改其值会导致 setting-constant 错误。参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Constant-Variables.html#Constant-Variables][Constant Variables]] 。
+
+    + Function: booleanp object
+
+      Return non-nil if object is one of the two canonical boolean values: t or nil.
+
+      如果 ojbect 是两个标准布尔值（t 或 nil）之一，返回 non-nil。
+
+*** 1.3.3 Evaluation Notation（求值说明）
+
+    A Lisp expression that you can evaluate is called a form. Evaluating a form always produces a result, which is a Lisp object. In the examples in this manual, this is indicated with ‘’:
+
+    可求值的 lisp 表达式称为 form。对 form 求值结果总是会 lisp ojbect。本手册中的例子中，求值结果用‘⇒’指示。
+
+    #+BEGIN_EXAMPLE
+(car '(1 2))
+⇒ 1
+    #+END_EXAMPLE
+
+    You can read this as “(car '(1 2)) evaluates to 1.”
+
+    可读作 =(car '(1 2))= 求值得 1。
+
+    When a form is a macro call, it expands into a new form for Lisp to evaluate. We show the result of the expansion with ‘==>’. We may or may not show the result of the evaluation of the expanded form.
+
+    当 form 是宏调用时，会扩展为新 form 供 lisp 求值。用 ‘==>’ 来指示扩展结果。不一定会显示扩展 form 的求值结果。
+    #+BEGIN_EXAMPLE
+(third '(a b c))
+==> (car (cdr (cdr '(a b c))))
+⇒ c
+    #+END_EXAMPLE
+
+    Sometimes to help describe one form we show another form that produces identical results. The exact equivalence of two forms is indicated with ‘==’.
+
+    有时为了描述一个 form，会显示另外一个产生同样结果的 form。两个表用‘==’表示等价。
+
+    #+BEGIN_EXAMPLE
+(make-sparse-keymap) == (list 'keymap)
+    #+END_EXAMPLE
+
+*** 1.3.4 Printing Notation（打印说明）
+    Many of the examples in this manual print text when they are evaluated. If you execute example code in a Lisp Interaction buffer (such as the buffer ‘*scratch*’), the printed text is inserted into the buffer. If you execute the example by other means (such as by evaluating the function eval-region), the printed text is displayed in the echo area.
+
+    本手册中的许多示例在求值时都会打印文本。如果在 Lisp Interaction buffer（例如 =*scratch*= buffer）中执行示例代码，打印的文本会插入 buffer 中。 如果通过其他方式执行该示例（例如通过调用 eval-region 函数），则打印文本将显示在回显区（echo area）域中。
+
+    Examples in this manual indicate printed text with ‘-|’, irrespective of where that text goes. The value returned by evaluating the form follows on a separate line with ‘⇒’.
+
+    本手册中的示例使用 =-|= 指示打印文本，表示与文本位置无关。form 求值返回的结果显示以 “⇒” 开始的单独行中。
+    #+BEGIN_EXAMPLE
+(progn (prin1 'foo) (princ "\n") (prin1 'bar))
+-| foo
+-| bar
+⇒ bar
+    #+END_EXAMPLE
+
+*** 1.3.5 Error Messages（错误消息）
+    Some examples signal errors. This normally displays an error message in the echo area. We show the error message on a line starting with ‘error-->’. Note that ‘error-->’ itself does not appear in the echo area.
+
+    一些例子产生错误。通常会在回显区域中显示错误消息。以 =error-->= 开始的行显示错误消息。请注意， =error-->= 本身不会出现在回显区域。
+    #+BEGIN_EXAMPLE
+(+ 23 'x)
+error--> Wrong type argument: number-or-marker-p, x
+    #+END_EXAMPLE
+
+*** 1.3.6 Buffer Text Notation（缓冲区文本说明）
+    Some examples describe modifications to the contents of a buffer, by showing the “before” and “after” versions of the text. These examples show the contents of the buffer in question between two lines of dashes containing the buffer name. In addition, ‘-!-’ indicates the location of point. (The symbol for point, of course, is not part of the text in the buffer; it indicates the place between two characters where point is currently located.)
+
+    一些示例通过显示文本的前后版本来描述对缓冲区内容的修改。这些示例在两行破折号之间显示了 buffer 内容，破折号所在行中包含 buffer 名。另外， =-!-= 表示 point 的位置。 （当然，表示 point 的符号不是 buffer 文本的一部分; 它表示当前 point 所在的位置。）
+
+    #+BEGIN_EXAMPLE
+---------- Buffer: foo ----------
+This is the -!-contents of foo.
+---------- Buffer: foo ----------
+
+(insert "changed ")
+⇒ nil
+---------- Buffer: foo ----------
+This is the changed -!-contents of foo.
+---------- Buffer: foo ----------
+    #+END_EXAMPLE
+
+*** 1.3.7 Format of Descriptions（描述的格式）
+    Functions, variables, macros, commands, user options, and special forms are described in this manual in a uniform format. The first line of a description contains the name of the item followed by its arguments, if any. The category—function, variable, or whatever—appears at the beginning of the line. The description follows on succeeding lines, sometimes with examples.
+
+    本手册以统一格式描述了函数，变量，宏，命令，用户选项和特殊 form。描述的第一行包含名称，以及可能有的参数。类别（函数，变量或其他）也在行首。然后是描述，有时还有示例。
+
+    + A Sample Function Description: A description of an imaginary function, foo.
+
+      示例函数描述：虚函数 foo 的描述。
+
+    + A Sample Variable Description: A description of an imaginary variable, electric-future-map.
+
+      示例变量描述：虚拟变量 electric-future-map 的描述。
+
+**** 1.3.7.1 A Sample Function Description（简单的函数描述）
+     In a function description, the name of the function being described appears first. It is followed on the same line by a list of argument names. These names are also used in the body of the description, to stand for the values of the arguments.
+
+     函数描述包括函数名字和变量名。描述部分也会使用变量名来代表参数的值。
+
+     The appearance of the keyword &optional in the argument list indicates that the subsequent arguments may be omitted (omitted arguments default to nil). Do not write &optional when you call the function.
+
+     变量列表中的关键词 =&optional= 表明后续的参数可以被省略（省略参数默认为 nil）。调用该函数时不要写 =&optional= 。
+
+     The keyword &rest (which must be followed by a single argument name) indicates that any number of arguments can follow. The single argument name following &rest will receive, as its value, a list of all the remaining arguments passed to the function. Do not write &rest when you call the function.
+
+     关键字 =&rest= （必须后跟单个参数）表明其后可以使任意数量的参数（译注：就是变参）。=&rest= 之后的单个参数将传递给该函数的剩余参数作为列表作为它的值。调用该函数时不要写 =&rest= 。
+
+     Here is a description of an imaginary function foo:
+
+     以下是假想函数 foo 的描述。
+
+     #+BEGIN_QUOTE
+     Function: foo integer1 &optional integer2 &rest integers
+     The function foo subtracts integer1 from integer2, then adds all the rest of the arguments to the result. If integer2 is not supplied, then the number 19 is used by default.
+
+     (foo 1 5 3 9)
+     ⇒ 16
+     (foo 5)
+     ⇒ 14
+     More generally,
+
+     (foo w x y...)
+     ==
+     (+ (- x w) y...)
+
+     #+END_QUOTE
+
+     By convention, any argument whose name contains the name of a type (e.g., integer, integer1 or buffer) is expected to be of that type. A plural of a type (such as buffers) often means a list of objects of that type. An argument named object may be of any type. (For a list of Emacs object types, see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types][Lisp Data Types]] .) An argument with any other sort of name (e.g., new-file) is specific to the function; if the function has a documentation string, the type of the argument should be described there (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Documentation.html#Documentation][Documentation]] ).
+
+     按照惯例，任何名称包含类型名称（例如，integer, integer1 or buffer）的参数都应该是该类型。复数类型（例如 buffers）通常表示该类型的对象列表。名为 object 的参数可以是任何类型。（有关 Emacs 对象类型的列表，[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types][Lisp Data Types]] 。）具有任何其他类型名称的参数（例如，new-file）特定于该函数; 如果函数有文档，那么应该在那里描述参数的类型（参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Documentation.html#Documentation][Documentation]] ）。
+
+     See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lambda-Expressions.html#Lambda-Expressions][Lambda Expressions]], for a more complete description of arguments modified by &optional and &rest.
+
+     有关由 =＆optional= 和 =＆rest= 修改参数的更完整描述，参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lambda-Expressions.html#Lambda-Expressions][Lambda Expressions]] 。
+
+     Command, macro, and special form descriptions have the same format, but the word ‘Function’ is replaced by ‘Command’, ‘Macro’, or ‘Special Form’, respectively. Commands are simply functions that may be called interactively; macros process their arguments differently from functions (the arguments are not evaluated), but are presented the same way.
+
+     命令，宏和特殊 form 描述具有相同的格式，但 “Function” 分别由 ‘Command’, ‘Macro’, or ‘Special Form’ 替换。命令只是可以交互调用的函数; 宏处理它们的参数与函数不同（参数不被求值），但是表示方式相同。
+
+     The descriptions of macros and special forms use a more complex notation to specify optional and repeated arguments, because they can break the argument list down into separate arguments in more complicated ways. ‘[optional-arg]’ means that optional-arg is optional and ‘repeated-args...’ stands for zero or more arguments. Parentheses are used when several arguments are grouped into additional levels of list structure. Here is an example:
+
+     宏和特殊 form 使用更复杂的表示法来指定可选和重复的参数，因为它们可以用更复杂的方式将参数列表分解为单独的参数。 '[optional-arg]' 表示 optional-arg 是可选的，'repeated-args ...'表示零个或多个参数。使用括号将多个参数被分组为列表结构的不同级别。这是一个例子：
+
+     #+BEGIN_QUOTE
+     Special Form: count-loop (var [from to [inc]]) body...
+     #+END_QUOTE
+
+     This imaginary special form implements a loop that executes the body forms and then increments the variable var on each iteration. On the first iteration, the variable has the value from; on subsequent iterations, it is incremented by one (or by inc if that is given). The loop exits before executing body if var equals to. Here is an example:
+
+     这个虚构的特殊 form 实现了一个循环，执行 /body/，然后在每次迭代时递增变量 /var/。在第一次迭代中，变量的值为 /from/; 在后续迭代中，它增加 1（如果给出则增加为 /inc/）。如果 /var/ 等于/to/，则循环在执行 body 之前退出。这是一个例子：
+
+     #+BEGIN_SRC elisp
+(count-loop (i 0 10)
+  (prin1 i) (princ " ")
+  (prin1 (aref vector i))
+  (terpri))
+     #+END_SRC
+
+     If from and to are omitted, var is bound to nil before the loop begins, and the loop exits if var is non-nil at the beginning of an iteration. Here is an example:
+
+     如果省略 /from/ 和 /to/，则在循环开始之前将 var 绑定为 nil，如果 var 在迭代开始时为非 nil，则循环退出。这是一个例子：
+     #+BEGIN_SRC elisp
+(count-loop (done)
+   (if (pending)
+      (fixit)
+        (setq done t)))
+     #+END_SRC
+
+
+     In this special form, the arguments from and to are optional, but must both be present or both absent. If they are present, inc may optionally be specified as well. These arguments are grouped with the argument var into a list, to distinguish them from body, which includes all remaining elements of the form.
+
+     在这种特殊 form 中，/from/ 和 /to/ 是可选的，但必须同时存在或两者都不存在。如果它们存在，也可以选择指定 /inc/ 。这些参数与参数 var 组合成一个列表，以区别于 /body/ ，/body/ 包括 form 的所有剩余元素。
+
+**** 1.3.7.2 A Sample Variable Description（简单的变量描述）
+     A variable is a name that can be bound (or set) to an object. The object to which a variable is bound is called a value; we say also that variable holds that value. Although nearly all variables can be set by the user, certain variables exist specifically so that users can change them; these are called user options. Ordinary variables and user options are described using a format like that for functions, except that there are no arguments.
+
+     变量是可以绑定（或设置）到对象的名称。变量绑定的对象称为值（value）; 我们也说变量具有该值。用户几乎可以设置所有变量，但某些用户可以设置的特殊变量称为用户选项。 普通变量和用户选项使用类似于函数的格式来描述，不同的事没有参数。
+
+     Here is a description of the imaginary electric-future-map variable.
+
+     这里有一个虚构的 electric-future-map 变量的描述。
+
+     #+BEGIN_EXAMPLE
+Variable: electric-future-map
+     #+END_EXAMPLE
+
+     The value of this variable is a full keymap used by Electric Command Future mode. The functions in this map allow you to edit commands you have not yet thought about executing.
+
+     此变量的值是被 Electric Command Future mode 使用的完整键映射。该映射中的函数允许编辑尚未考虑执行的命令。
+
+     User option descriptions have the same format, but `Variable' is replaced by `User Option'.
+
+     用户选项描述具有相同的格式，只是‘Variable’被替换为‘User Option’。
+
+** 1.4 Version Information
+   These facilities provide information about which version of Emacs is in use.
+
+   这些工具提供有关正在使用的 Emacs 版本的信息。
+
+   + Command: emacs-version &optional here
+
+     This function returns a string describing the version of Emacs that is running. It is useful to include this string in bug reports.
+
+     此函数返回一个字符串，描述正在运行的 Emacs 的版本。在 bug 报告中包含此字符串很有用。
+
+     #+BEGIN_EXAMPLE
+(emacs-version)
+⇒ "GNU Emacs 26.1 (build 1, x86_64-unknown-linux-gnu,
+GTK+ Version 3.16) of 2017-06-01"
+     #+END_EXAMPLE
+
+     If here is non-nil, it inserts the text in the buffer before point, and returns nil. When this function is called interactively, it prints the same information in the echo area, but giving a prefix argument makes here non-nil.
+
+     如果 /here/ 是 non-nil，它会在 buffer 中 point 前插入文本，并返回 nil。当以交互方式调用此函数时，它会在回显区中输出相同的信息，但是给定的前缀参数会使 /here/ 为 non-nil。
+
+   + Variable: emacs-build-time
+
+     The value of this variable indicates the time at which Emacs was built. It is a list of four integers, like the value of current-time (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-of-Day.html#Time-of-Day][Time of Day]] ), or is nil if the information is not available.
+
+     此变量的值表示构建 Emacs 的时间。它是四个整数的列表，类似 current-time 的值（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-of-Day.html#Time-of-Day][Time of Day]] ），如果信息不可用，则为 nil。
+
+     #+BEGIN_EXAMPLE
+emacs-build-time
+⇒ (20614 63694 515336 438000)
+     #+END_EXAMPLE
+
+   + Variable: emacs-version
+
+     The value of this variable is the version of Emacs being run. It is a string such as "26.1". A value with three numeric components, such as "26.0.91", indicates an unreleased test version. (Prior to Emacs 26.1, the string includes an extra final component with the integer that is now stored in emacs-build-number; e.g., "25.1.1".)
+
+     此变量的值是正在运行的 Emacs 的版本。它是一个字符串，如 “26.1”。具有三个数字组件的值（例如 “26.0.91”）表示未发布的测试版本。（在 Emacs 26.1 之前，该字符串包含一个额外的整数，现在存储在 emacs-build-number 中; 例如，“25.1.1”。）
+
+   + Variable: emacs-major-version
+
+     The major version number of Emacs, as an integer. For Emacs version 23.1, the value is 23.
+
+     Emacs 的主要版本号，为整数。对于 Emacs 版本 23.1，值为 23。
+
+   + Variable: emacs-minor-version
+
+     The minor version number of Emacs, as an integer. For Emacs version 23.1, the value is 1.
+
+     Emacs 的次要版本号，为整数。对于 Emacs 版本 23.1，值为 1。
+
+   + Variable: emacs-build-number
+
+     An integer that increments each time Emacs is built in the same directory (without cleaning). This is only of relevance when developing Emacs.
+
+     在同一目录中构建时，每次 Emacs 递增的整数（不清除）。这在开发 Emacs 时才有意义。
+
+** 1.5 Acknowledgements（致谢）
+   This manual was originally written by Robert Krawitz, Bil Lewis, Dan LaLiberte, Richard M. Stallman and Chris Welty, the volunteers of the GNU manual group, in an effort extending over several years. Robert J. Chassell helped to review and edit the manual, with the support of the Defense Advanced Research Projects Agency, ARPA Order 6082, arranged by Warren A. Hunt, Jr. of Computational Logic, Inc. Additional sections have since been written by Miles Bader, Lars Brinkhoff, Chong Yidong, Kenichi Handa, Lute Kamstra, Juri Linkov, Glenn Morris, Thien-Thi Nguyen, Dan Nicolaescu, Martin Rudalics, Kim F. Storm, Luc Teirlinck, and Eli Zaretskii, and others.
+
+   本手册最初由 Robert Krawitz，Bil Lewis，Dan LaLiberte，Richard M. Stallman 和 Chris Welty 撰写，他们是 GNU 手册小组的志愿者，经过数年的努力。 在国防高级研究计划局 ARPA 6082 令 的支持下，由计算逻辑公司的 Warren A. Hunt，Jr. 安排 Robert J. Chassell 帮助审查和编辑了该手册。其他部分由 Miles Bader，Lars Brinkhoff，Chong Yidong，Kenichi Handa，Lute Kamstra，Juri Linkov，Glenn Morris，Thien-Thi Nguyen，Dan Nicolaescu，Martin Rudalics，Kim F. Storm，Luc Teirlinck 和 Eli Zaretskii 等人撰写。
+
+   Corrections were supplied by Drew Adams, Juanma Barranquero, Karl Berry, Jim Blandy, Bard Bloom, Stephane Boucher, David Boyes, Alan Carroll, Richard Davis, Lawrence R. Dodd, Peter Doornbosch, David A. Duff, Chris Eich, Beverly Erlebacher, David Eckelkamp, Ralf Fassel, Eirik Fuller, Stephen Gildea, Bob Glickstein, Eric Hanchrow, Jesper Harder, George Hartzell, Nathan Hess, Masayuki Ida, Dan Jacobson, Jak Kirman, Bob Knighten, Frederick M. Korz, Joe Lammens, Glenn M. Lewis, K. Richard Magill, Brian Marick, Roland McGrath, Stefan Monnier, Skip Montanaro, John Gardiner Myers, Thomas A. Peterson, Francesco Potortì, Friedrich Pukelsheim, Arnold D. Robbins, Raul Rockwell, Jason Rumney, Per Starbäck, Shinichirou Sugou, Kimmo Suominen, Edward Tharp, Bill Trost, Rickard Westman, Jean White, Eduard Wiebe, Matthew Wilding, Carl Witty, Dale Worley, Rusty Wright, and David D. Zuhn.
+
+   Drew Adams，Juanma Barranquero，Karl Berry，Jim Blandy，Bard Bloom，Stephane Boucher，David Boyes，Alan Carroll，Richard Davis，Lawrence R. Dodd，Peter Doornbosch，David A. Duff，Chris Eich，Beverly Erlebacher，David Eckelkamp，Ralf Fassel，Eirik Fuller，Stephen Gildea，Bob Glickstein，Eric Hanchrow，Jesper Harder，George Hartzell，Nathan Hess，Masayuki Ida，Dan Jacobson，Jak Kirman，Bob Knighten，Frederick M. Korz，Joe Lammens，Glenn M. Lewis，K。Richard Magill，Brian Marick，Roland McGrath，Stefan Monnier，Skip Montanaro，John Gardiner Myers，Thomas A. Peterson，FrancescoPotortì，Friedrich Pukelsheim，Arnold D. Robbins，Raul Rockwell，Jason Rumney，PerStarbäck，Shinichirou Sugou，Kimmo Suominen，Edward Tharp，Bill Trost，Rickard Westman，Jean White，Eduard Wiebe，Matthew Wilding，Carl Witty，Dale Worley，Rusty Wright 和 David D. Zuh 提供更正。
+
+   For a more complete list of contributors, please see the relevant change log entries in the Emacs source repository.
+
+   有关更完整的贡献者列表，请参阅 Emacs 源码仓库中的相关更改日志条目。
