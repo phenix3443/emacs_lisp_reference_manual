@@ -863,7 +863,6 @@ beg end plist
 
       语法表（请参见语法表）。
 
-
 *** 2.3.11 Bool-Vector Type
     A bool-vector is a one-dimensional array whose elements must be t or nil.
 
@@ -892,7 +891,6 @@ beg end plist
      (equal #&3"\377" #&3"\007")
           ⇒ t
     #+END_EXAMPLE
-
 
 *** 2.3.12 Hash Table Type
     A hash table is a very fast kind of lookup table, somewhat like an alist in that it maps keys to corresponding values, but much faster. The printed representation of a hash table specifies its properties and contents, like this:
@@ -980,22 +978,600 @@ beg end plist
 *** 2.3.19 Autoload Type
     An autoload object is a list whose first element is the symbol autoload. It is stored as the function definition of a symbol, where it serves as a placeholder for the real definition. The autoload object says that the real definition is found in a file of Lisp code that should be loaded when necessary. It contains the name of the file, plus some other information about the real definition.
 
-    自动加载对象是一个列表，其第一个元素是符号 autoload。它存储为符号的函数定义，它用作实际定义的占位符。 自动加载对象表示真正的定义是在 Lisp 代码文件中找到的，应该在必要时加载。 它包含文件的名称，以及有关实际定义的一些其他信息。
+    自动加载对象是一个列表，其第一个元素是符号 autoload。它存储为符号的函数定义，用作实际定义的占位符。 自动加载对象表示真正的定义是在 Lisp 代码文件中找到的，应该在必要时加载。 它包含文件的名称，以及有关实际定义的一些其他信息。
 
-加载文件后，符号应具有不是自动加载对象的新函数定义。 然后调用新定义，好像它一直在那里开始。 从用户的角度来看，函数调用使用加载文件中的函数定义按预期工作。
-
-自动加载对象通常使用自动加载功能创建，该功能将对象存储在符号的功能单元中。 有关详细信息，请参阅自动加载。
     After the file has been loaded, the symbol should have a new function definition that is not an autoload object. The new definition is then called as if it had been there to begin with. From the user's point of view, the function call works as expected, using the function definition in the loaded file.
 
+    加载文件后，符号应具有新函数定义，而不是自动加载对象。调用新定义时好像它一开始就在直在那里。 从用户的角度来看，函数调用使用加载文件中的函数定义按预期工作。
+
     An autoload object is usually created with the function autoload, which stores the object in the function cell of a symbol. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html#Autoload][Autoload]] , for more details.
+
+    自动加载对象通常使用 autoload 函数创建，该功能将对象存储在符号的函数单元中。详见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Autoload.html#Autoload][Autoload]] 。
 
 *** 2.3.20 Finalizer Type
     A finalizer object helps Lisp code clean up after objects that are no longer needed. A finalizer holds a Lisp function object. When a finalizer object becomes unreachable after a garbage collection pass, Emacs calls the finalizer's associated function object. When deciding whether a finalizer is reachable, Emacs does not count references from finalizer objects themselves, allowing you to use finalizers without having to worry about accidentally capturing references to finalized objects themselves.
 
-    Errors in finalizers are printed to *Messages*. Emacs runs a given finalizer object's associated function exactly once, even if that function fails.
+    当对象不再需要后，finalizer 对象帮助 Lisp 代码进行清理。finalizer 包含一个 Lisp 函数对象。当垃圾收集传递后，finalizer 对象变得无法访问时，Emacs 将调用 finalizer 的关联函数对象。在确定 finalizer 是否可达时，Emacs 不计算 finalizer 对象本身的引用，允许您使用 finalizer 而不必担心意外捕获对已终结对象本身的引用。
 
-    — Function: make-finalizer function
-    Make a finalizer that will run function. function will be called after garbage collection when the returned finalizer object becomes unreachable. If the finalizer object is reachable only through references from finalizer objects, it does not count as reachable for the purpose of deciding whether to run function. function will be run once per finalizer object.
+    Errors in finalizers are printed to =*Messages*= . Emacs runs a given finalizer object's associated function exactly once, even if that function fails.
+
+    finalizer 中的错误将打印到 =*Messages*= 。即使该函数失败，Emacs 也只运行一次给定的 finalizer 对象的关联函数。
+
+    + Function: make-finalizer function
+
+      Make a finalizer that will run function. function will be called after garbage collection when the returned finalizer object becomes unreachable. If the finalizer object is reachable only through references from finalizer objects, it does not count as reachable for the purpose of deciding whether to run function. function will be run once per finalizer object.
+
+      制作一个将运行功能的 finalizer。当返回的 finalizer 对象变得无法访问时，将在垃圾回收后调用该函数。如果 finalizer 对象只能通过 finalizer 对象的引用来访问，则为了决定是否运行函数，它不计为可达。每个 finalizer 对象将运行一次函数。
+
+** 2.4 Editing Types
+   The types in the previous section are used for general programming purposes, and most of them are common to most Lisp dialects. Emacs Lisp provides several additional data types for purposes connected with editing.
+
+   上一节中的类型用于一般编程目的，并且大多数类型对于大多数 Lisp 方言是常见的。Emacs Lisp 提供了几种额外的数据类型用于编辑。
+
+   + Buffer Type: The basic object of editing.
+
+     缓冲区类型：编辑的基本对象。
+
+   + Marker Type: A position in a buffer.
+
+     标记类型：缓冲区中的位置。
+
+   + Window Type: Buffers are displayed in windows.
+
+     窗口类型：缓冲区显示在窗口中。
+
+   + Frame Type: Windows subdivide frames.
+
+     帧类型：Windows 细分出的帧。
+
+   + Terminal Type: A terminal device displays frames.
+
+     终端类型：显示帧的终端设备。
+
+   + Window Configuration Type: Recording the way a frame is subdivided.
+
+     窗口配置类型：记录帧细分的方式。
+
+   + Frame Configuration Type: Recording the status of all frames.
+
+     帧配置类型：记录所有帧的状态。
+
+   + Process Type: A subprocess of Emacs running on the underlying OS.
+
+     进程类型：在底层操作系统上运行的 Emacs 的子进程。
+
+   + Thread Type: A thread of Emacs Lisp execution.
+
+     线程类型：Emacs Lisp 执行的线程。
+
+   + Mutex Type: An exclusive lock for thread synchronization.
+
+     互斥锁类型：线程同步的独占锁。
+
+   + Condition Variable Type: Condition variable for thread synchronization.
+
+     条件变量类型：线程同步的条件变量。
+
+   + Stream Type: Receive or send characters.
+
+     流类型：接收或发送字符。
+
+   + Keymap Type: What function a keystroke invokes.
+
+     键映射类型：键击调用的功能。
+
+   + Overlay Type: How an overlay is represented.
+
+     叠加类型：如何表示叠加层。
+
+   + Font Type: Fonts for displaying text.
+
+     字体类型：用于显示文本的字体。
+
+*** 2.4.1 Buffer Type
+    A buffer is an object that holds text that can be edited (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffers.html#Buffers][Buffers]] ). Most buffers hold the contents of a disk file (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Files.html#Files][Files]] ) so they can be edited, but some are used for other purposes. Most buffers are also meant to be seen by the user, and therefore displayed, at some time, in a window (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html#Windows][Windows]] ). But a buffer need not be displayed in any window. Each buffer has a designated position called point (see  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Positions.html#Positions][Positions]] ); most editing commands act on the contents of the current buffer in the neighborhood of point. At any time, one buffer is the current buffer.
+
+    缓冲区是一个保存可编辑文本的对象（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffers.html#Buffers][Buffers]] ）。大多数缓冲区加载磁盘文件的内容（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Files.html#Files][Files]]  ），以便可以对其进行编辑，但有些缓冲区用于其他目的。大多数缓冲区也可以由用户看到，因此在某个时间显示在窗口中（参见  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html#Windows][Windows]] ）。但是不需要在任何窗口中显示缓冲区。每个缓冲区都有一个叫做 point 的指定位置（见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Positions.html#Positions][Positions]] ）; 大多数编辑命令作用于当前缓冲区中点附近的内容。在任何时候，一个缓冲区是当前缓冲区。
+
+    The contents of a buffer are much like a string, but buffers are not used like strings in Emacs Lisp, and the available operations are different. For example, you can insert text efficiently into an existing buffer, altering the buffer's contents, whereas inserting text into a string requires concatenating substrings, and the result is an entirely new string object.
+
+    缓冲区的内容很像字符串，但 Emacs Lisp 中缓冲区不像 字符串那样使用，可用的操作也不同。例如，您可以将文本有效地插入到现有缓冲区中，更改缓冲区的内容，而将文本插入字符串需要连接子字符串，结果是一个全新的字符串对象。
+
+    Many of the standard Emacs functions manipulate or test the characters in the current buffer; a whole chapter in this manual is devoted to describing these functions (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text.html#Text][Text]] ).
+
+    许多标准 Emacs 函数操作或测试当前缓冲区中的字符; 本手册的整个章节专门用于描述这些功能（参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text.html#Text][Text]] ）。
+
+    Several other data structures are associated with each buffer:
+
+    其他几个数据结构与每个缓冲区相关联：
+
+    + a local syntax table (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Syntax-Tables.html#Syntax-Tables][Syntax Tables]]);
+      本地语法表（参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Syntax-Tables.html#Syntax-Tables][Syntax Tables]]）;
+
+    + a local keymap (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymaps.html#Keymaps][Keymaps]]); and,
+
+      本地键映射（参见[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymaps.html#Keymaps][Keymaps]]）; 和，
+
+    + a list of buffer-local variable bindings (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer_002dLocal-Variables.html#Buffer_002dLocal-Variables][Buffer-Local Variables]]).
+
+      缓冲区局部变量绑定列表（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Buffer_002dLocal-Variables.html#Buffer_002dLocal-Variables][Buffer-Local Variables]]）。
+
+    + overlays (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html#Overlays][Overlays]]).
+
+      叠加（请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html#Overlays][Overlays]]）。
+
+    + text properties for the text in the buffer (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html#Text-Properties][Text Properties]]).
+
+      缓冲区中文本的文本属性（请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html#Text-Properties][Text Properties]]）。
+
+    The local keymap and variable list contain entries that individually override global bindings or values. These are used to customize the behavior of programs in different buffers, without actually changing the programs.
+
+    本地键映射和变量列表包含单独覆盖全局绑定或值的条目。这些用于自定义不同缓冲区中程序的行为，而无需实际更改程序。
+
+    A buffer may be indirect, which means it shares the text of another buffer, but presents it differently. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Indirect-Buffers.html#Indirect-Buffers][Indirect Buffers]].
+
+    缓冲区可以是间接的，这意味着它共享另一个缓冲区的文本，但以不同的方式呈现它。请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Indirect-Buffers.html#Indirect-Buffers][Indirect Buffers]]。
+
+    Buffers have no read syntax. They print in hash notation, showing the buffer name.
+
+    缓冲区没有读取语法。它们以哈希表示法打印，显示缓冲区名称。
+
+    #+BEGIN_EXAMPLE
+     (current-buffer)
+          ⇒ #<buffer objects.texi>
+
+    #+END_EXAMPLE
+
+*** 2.4.2 Marker Type
+    A marker denotes a position in a specific buffer. Markers therefore have two components: one for the buffer, and one for the position. Changes in the buffer's text automatically relocate the position value as necessary to ensure that the marker always points between the same two characters in the buffer.
+
+    标记表示特定缓冲区中的位置。 因此，标记有两个组成部分：缓冲区和位置。 更改缓冲区文本中的会根据需要自动重定位位置值，以确保标记始终指向缓冲区中相同的两个字符。
+
+    Markers have no read syntax. They print in hash notation, giving the current character position and the name of the buffer.
+
+    标记没有读取语法。 它们以散列表示法打印，给出当前字符位置和缓冲区的名称。
+    #+BEGIN_EXAMPLE
+     (point-marker)
+          ⇒ #<marker at 10779 in objects.texi>
+    #+END_EXAMPLE
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Markers.html#Markers][Markers]] , for information on how to test, create, copy, and move markers.
+
+    有关如何测试，创建，复制和移动标记，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Markers.html#Markers][Markers]] 。
+
+*** 2.4.3 Window Type
+    A window describes the portion of the terminal screen that Emacs uses to display a buffer. Every window has one associated buffer, whose contents appear in the window. By contrast, a given buffer may appear in one window, no window, or several windows.
+
+    窗口描述了 Emacs 用于显示缓冲区的终端屏幕部分。每个窗口都有一个关联的缓冲区，其内容显示在窗口中。相比之下，给定的缓冲区可能出现在一个窗口，没有窗口或几个窗口。
+
+    Though many windows may exist simultaneously, at any time one window is designated the selected window. This is the window where the cursor is (usually) displayed when Emacs is ready for a command. The selected window usually displays the current buffer (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Current-Buffer.html#Current-Buffer][Current Buffer]] ), but this is not necessarily the case.
+
+    尽管可以同时存在许多窗口，但是在任何时候只有一个被指定为所选择的窗口。它是当 Emacs 准备好命令时（通常）显示光标的窗口。所选窗口通常显示当前缓冲区（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Current-Buffer.html#Current-Buffer][Current Buffer]] ），但不一定是这种情况。
+
+    Windows are grouped on the screen into frames; each window belongs to one and only one frame. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Type.html#Frame-Type][Frame Type]].
+
+    Windows 在屏幕上分组为 frames; 每个窗口属于一个且只有一个帧。请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Type.html#Frame-Type][Frame Type]]。
+
+    Windows have no read syntax. They print in hash notation, giving the window number and the name of the buffer being displayed. The window numbers exist to identify windows uniquely, since the buffer displayed in any given window can change frequently.
+
+    Windows 没有读取语法。它们以散列表示法打印，给出窗口号和正在显示的缓冲区的名称。存在窗口编号以唯一地标识窗口，因为在任何给定窗口中显示的缓冲区可以频繁地改变。
+
+    #+BEGIN_EXAMPLE
+     (selected-window)
+          ⇒ #<window 1 on objects.texi>
+    #+END_EXAMPLE
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html#Windows][Windows]] , for a description of the functions that work on windows.
+
+    有关在 Windows 上运行的功能的说明，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Windows.html#Windows][Windows]] 。
+
+*** 2.4.4 Frame Type
+    A frame is a screen area that contains one or more Emacs windows; we also use the term “frame” to refer to the Lisp object that Emacs uses to refer to the screen area.
+
+    frame 是包含一个或多个 Emacs window 的屏幕区域; 我们还使用术语 “frame” 来指代 Emacs 用来引用屏幕区域的 Lisp 对象。
+
+    Frames have no read syntax. They print in hash notation, giving the frame's title, plus its address in core (useful to identify the frame uniquely).
+
+    frame 没有读取语法。 它们以散列表示法打印，给出 frame 的标题，以及核心地址（用于唯一标识 frame）。
+
+    #+BEGIN_EXAMPLE
+     (selected-frame)
+          ⇒ #<frame emacs@psilocin.gnu.org 0xdac80>
+    #+END_EXAMPLE
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frames.html#Frames][Frames]] , for a description of the functions that work on frames.
+
+    有关对框架起作用的函数的说明，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frames.html#Frames][Frames]] 。
+
+*** 2.4.5 Terminal Type
+    A terminal is a device capable of displaying one or more Emacs frames (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Type.html#Frame-Type][Frame Type]]).
+
+    终端是能够显示一个或多个 Emacs frame 的设备（参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Type.html#Frame-Type][Frame Type]]）。
+
+    Terminals have no read syntax. They print in hash notation giving the terminal's ordinal number and its TTY device file name.
+
+    终端没有读取语法。 它们以散列表示法打印，给出终端的序号和 TTY 设备文件名。
+
+    #+BEGIN_EXAMPLE
+     (get-device-terminal nil)
+          ⇒ #<terminal 1 on /dev/tty>
+    #+END_EXAMPLE
+
+*** 2.4.6 Window Configuration Type
+    A window configuration stores information about the positions, sizes, and contents of the windows in a frame, so you can recreate the same arrangement of windows later.
+
+    窗口配置存储有关 frame 中窗口的位置，大小和内容的信息，因此可以稍后重新创建相同的窗口排列。
+
+    Window configurations do not have a read syntax; their print syntax looks like ‘#<window-configuration>’. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Window-Configurations.html#Window-Configurations][Window Configurations]], for a description of several functions related to window configurations.
+
+    窗口配置没有读取语法;  它们的打印语法类似于 “＃<window-configuration>”。 有关窗口配置的若干功能的说明，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Window-Configurations.html#Window-Configurations][Window Configurations]]。
+
+*** 2.4.7 Frame Configuration Type
+    A frame configuration stores information about the positions, sizes, and contents of the windows in all frames. It is not a primitive type—it is actually a list whose car is frame-configuration and whose cdr is an alist. Each alist element describes one frame, which appears as the car of that element.
+
+    帧配置存储关于所有帧中的窗口的位置，大小和内容的信息。 它不是原始类型 - 它实际上是一个列表，其 car 是 frame-configuration， 其 cdr 是 alist。每个 alist 元素描述一个 frame，frame 作为该元素的 car。
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Configurations.html#Frame-Configurations][Frame Configurations]], for a description of several functions related to frame configurations.
+    有关帧配置的若干功能的说明，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Frame-Configurations.html#Frame-Configurations][Frame Configurations]]。
+
+*** 2.4.8 Process Type
+    The word process usually means a running program. Emacs itself runs in a process of this sort. However, in Emacs Lisp, a process is a Lisp object that designates a subprocess created by the Emacs process. Programs such as shells, GDB, ftp, and compilers, running in subprocesses of Emacs, extend the capabilities of Emacs. An Emacs subprocess takes textual input from Emacs and returns textual output to Emacs for further manipulation. Emacs can also send signals to the subprocess.
+
+    进程通常意味着正在运行的程序。Emacs 本身就是在这种进程中运行的。但是，在 Emacs Lisp 中，进程是一个 Lisp 对象，它指定由 Emacs 进程创建的子进程。在 Emacs 的子进程中运行的诸如 shell，GDB，ftp 和编译器之类的程序扩展了 Emacs 的功能。Emacs 子进程从 Emacs 获取文本输入，并将文本输出返回给 Emacs 以进行进一步操作。Emacs 还可以向子进程发送信号。
+
+    Process objects have no read syntax. They print in hash notation, giving the name of the process:
+
+    进程对象没有读取语法。它们以哈希表示法打印，给出进程的名称：
+
+    #+BEGIN_EXAMPLE
+     (process-list)
+          ⇒ (#<process shell>)
+    #+END_EXAMPLE
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Processes.html#Processes][Processes]] , for information about functions that create, delete, return information about, send input or signals to, and receive output from processes.
+
+    有关进程创建，删除，返回有关，向其发送输入或信号以及从进程接收输出的信息的功能的信息，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Processes.html#Processes][Processes]] 。
+
+*** 2.4.9 Thread Type
+    A thread in Emacs represents a separate thread of Emacs Lisp execution. It runs its own Lisp program, has its own current buffer, and can have subprocesses locked to it, i.e. subprocesses whose output only this thread can accept. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Threads.html#Threads][Threads]].
+
+    Emacs 中的线程表示 Emacs Lisp 单独执行的线程。它运行自己的 Lisp 程序，有自己的当前缓冲区，并且可以锁定子进程，例如，只有这个线程可以接受的输出的子进程。 参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Threads.html#Threads][Threads]] 。
+
+    Thread objects have no read syntax. They print in hash notation, giving the name of the thread (if it has been given a name) or its address in core:
+
+    线程对象没有读取语法。它们以哈希表示法打印，给出线程的名称（如果它已被赋予名称）或其在核心中的地址：
+
+    #+BEGIN_EXAMPLE
+     (all-threads)
+         ⇒ (#<thread 0176fc40>)
+    #+END_EXAMPLE
+
+*** 2.4.10 Mutex Type
+    A mutex is an exclusive lock that threads can own and disown, in order to synchronize between them. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Mutexes.html#Mutexes][Mutexes]].
+
+    互斥锁是线程可以拥有和释放的独占锁，以便在它们之间进行同步。请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Mutexes.html#Mutexes][Mutexes]].。
+
+    Mutex objects have no read syntax. They print in hash notation, giving the name of the mutex (if it has been given a name) or its address in core:
+
+    互斥对象没有读取语法。 它们以哈希表示法打印，给出互斥锁的名称（如果它已被赋予名称）或其核心地址：
+
+    #+BEGIN_EXAMPLE
+     (make-mutex "my-mutex")
+         ⇒ #<mutex my-mutex>
+     (make-mutex)
+         ⇒ #<mutex 01c7e4e0>
+    #+END_EXAMPLE
+
+*** 2.4.11 Condition Variable Type
+    A condition variable is a device for a more complex thread synchronization than the one supported by a mutex. A thread can wait on a condition variable, to be woken up when some other thread notifies the condition.
+
+    条件变量是比互斥锁更复杂的线程同步的设备。线程可以等待一个条件变量，当一些其他线程通知该条件时被唤醒。
+
+    Condition variable objects have no read syntax. They print in hash notation, giving the name of the condition variable (if it has been given a name) or its address in core:
+
+    条件变量对象没有读取语法。 它们以哈希表示法打印，给出条件变量的名称（如果它已被赋予名称）或其在核心中的地址：
+
+    #+BEGIN_EXAMPLE
+     (make-condition-variable (make-mutex))
+         ⇒ #<condvar 01c45ae8>
+    #+END_EXAMPLE
+
+*** 2.4.12 Stream Type
+    A stream is an object that can be used as a source or sink for characters—either to supply characters for input or to accept them as output. Many different types can be used this way: markers, buffers, strings, and functions. Most often, input streams (character sources) obtain characters from the keyboard, a buffer, or a file, and output streams (character sinks) send characters to a buffer, such as a =*Help*= buffer, or to the echo area.
+
+    流是一个对象，可以用作字符的源或接收器 - 为输入提供字符或接受它们作为输出。 许多不同类型可以这样使用：标记，缓冲区，字符串和函数。 大多数情况下，输入流（字符源）从键盘，缓冲区或文件中获取字符，输出流（字符接收器）将字符发送到缓冲区（如 =*Help*= 缓冲区）或回显区域。
+
+    The object nil, in addition to its other meanings, may be used as a stream. It stands for the value of the variable standard-input or standard-output. Also, the object t as a stream specifies input using the minibuffer (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers.html#Minibuffers][Minibuffers]] ) or output in the echo area (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html#The-Echo-Area][The Echo Area]] ).
+
+    对象 nil 除了其他含义之外，也可以用作流。它代表可变标准输入或标准输出的值。此外，作为流的对象 t 使用 mini buffer 作为特殊输入（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffers.html#Minibuffers][Minibuffers]] ）或回显区作为输出（请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html#The-Echo-Area][The Echo Area]] ）。
+
+    Streams have no special printed representation or read syntax, and print as whatever primitive type they are.
+
+    流没有特殊的打印表示或读取语法，打印输出它们的原始类型。
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Read-and-Print.html#Read-and-Print][Read and Print]] , for a description of functions related to streams, including parsing and printing functions.
+
+    请参阅  [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Read-and-Print.html#Read-and-Print][Read and Print]] 了解与流相关的功能的说明，包括解析和打印功能。
+
+*** 2.4.13 Keymap Type
+    A keymap maps keys typed by the user to commands. This mapping controls how the user's command input is executed. A keymap is actually a list whose car is the symbol keymap.
+
+    键映射将用户键入的键映射到命令。此映射控制用户命令输入的执行方式。键映射实际上是一个列表，其 car 是 符号 keymap。
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymaps.html#Keymaps][Keymaps]], for information about creating keymaps, handling prefix keys, local as well as global keymaps, and changing key bindings.
+
+    有关创建键映射，处理前缀键，本地键和全局键映射以及更改键绑定的信息，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Keymaps.html#Keymaps][Keymaps]]。
+
+*** 2.4.14 Overlay Type
+    An overlay specifies properties that apply to a part of a buffer. Each overlay applies to a specified range of the buffer, and contains a property list (a list whose elements are alternating property names and values). Overlay properties are used to present parts of the buffer temporarily in a different display style. Overlays have no read syntax, and print in hash notation, giving the buffer name and range of positions.
+
+    overlay 指定适用于缓冲区中一部分的属性。 每个 overlay 都应用于缓冲区的指定范围，并包含属性列表（其元素为交替属性名称和值的列表）。overlay 属性用于以不同的显示样式临时呈现缓冲区的一部分。overlay 没有读取语法，并以散列表示法打印，给出缓冲区名称和位置范围。
+
+    See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html#Overlays][Overlays]], for information on how you can create and use overlays.
+    有关如何创建和使用 overlay 的信息，请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Overlays.html#Overlays][Overlays]] 。
+
+*** 2.4.15 Font Type
+    A font specifies how to display text on a graphical terminal. There are actually three separate font types—font objects, font specs, and font entities—each of which has slightly different properties. None of them have a read syntax; their print syntax looks like ‘#<font-object>’, ‘#<font-spec>’, and ‘#<font-entity>’ respectively. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Low_002dLevel-Font.html#Low_002dLevel-Font][Low-Level Font]], for a description of these Lisp objects.
+
+    字体指定如何在图形终端上显示文本。实际上有三种不同的字体类型-字体对象，字体规格和字体实体 - 它们具有略微不同的属性。它们都没有读取语法;  它们的打印语法分别类似于 “＃<font-object>”，“＃font-spec>” 和 “＃<font-entity>”。 有关这些 Lisp 对象的说明，请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Low_002dLevel-Font.html#Low_002dLevel-Font][Low-Level Font]]。
+
+
+** 2.5 Read Syntax for Circular Objects
+
+   To represent shared or circular structures within a complex of Lisp objects, you can use the reader constructs ‘#n=’ and ‘#n#’.
+   要在 Lisp 对象的复合体中表示共享或循环结构，可以使用 reader 构造'#n ='和'#n＃'。
+
+   Use #n= before an object to label it for later reference; subsequently, you can use #n# to refer the same object in another place. Here, n is some integer. For example, here is how to make a list in which the first element recurs as the third element:
+
+   在对象之前使用 #n= 标记它以供以后参考; 随后，您可以使用 #n＃在另一个地方引用同一个对象。这里，n 是一些整数。例如，以下是如何创建第一个元素作为第三个元素重复出现的列表：
+
+   #+BEGIN_SRC elisp
+     (#1=(a) b #1#)
+   #+END_SRC
+
+   This differs from ordinary syntax such as this
+
+   这与诸如此类的普通语法不同：
+
+   #+BEGIN_SRC elisp
+     ((a) b (a))
+   #+END_SRC
+
+   which would result in a list whose first and third elements look alike but are not the same Lisp object. This shows the difference:
+
+   这将产生一个列表，其第一个和第三个元素看起来相似，但不是相同的 Lisp 对象。这显示了不同之处：
+
+   #+BEGIN_EXAMPLE
+     (prog1 nil
+       (setq x '(#1=(a) b #1#)))
+     (eq (nth 0 x) (nth 2 x))
+          ⇒ t
+     (setq x '((a) b (a)))
+     (eq (nth 0 x) (nth 2 x))
+          ⇒ nil
+   #+END_EXAMPLE
+
+   You can also use the same syntax to make a circular structure, which appears as an element within itself. Here is an example:
+
+   还可以使用相同的语法来创建循环结构，该结构在其自身中显示为元素。这是一个例子：
+
+   #+BEGIN_SRC elisp
+     #1=(a #1#)
+   #+END_SRC
+
+   This makes a list whose second element is the list itself. Here's how you can see that it really works:
+
+   这使得列表的第二个元素是列表本身。以下是您可以看到它确实有效的方法：
+   #+BEGIN_EXAMPLE
+     (prog1 nil
+       (setq x '#1=(a #1#)))
+     (eq x (cadr x))
+          ⇒ t
+   #+END_EXAMPLE
+   The Lisp printer can produce this syntax to record circular and shared structure in a Lisp object, if you bind the variable print-circle to a non-nil value. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Output-Variables.html#Output-Variables][Output Variables]].
+
+   如果将变量 print-circle 绑定到非零值，Lisp printer 可以生成此语法以记录在 Lisp 对象中 的循环和共享结构。请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Output-Variables.html#Output-Variables][Output Variables]]。
+
+** 2.6 Type Predicates
+   The Emacs Lisp interpreter itself does not perform type checking on the actual arguments passed to functions when they are called. It could not do so, since function arguments in Lisp do not have declared data types, as they do in other programming languages. It is therefore up to the individual function to test whether each actual argument belongs to a type that the function can use.
+
+   当调用函数时，Emacs Lisp 解释器本身不会对传递的实际参数执行类型检查。它不能这样做，因为 Lisp 中的函数参数没有声明数据类型，就像在其他编程语言中一样。因此，由单个函数来测试每个实际参数是否属于函数可以使用的类型。
+
+   All built-in functions do check the types of their actual arguments when appropriate, and signal a wrong-type-argument error if an argument is of the wrong type. For example, here is what happens if you pass an argument to + that it cannot handle:
+
+   所有内置函数都会在适当时检查其实际参数的类型，如果参数类型错误，则发出 wrong-type-argument 错误。例如，如果将无法处理的参数传递给+ ，会发生以下情况：
+
+   #+BEGIN_EXAMPLE
+     (+ 2 'a)
+          error--> Wrong type argument: number-or-marker-p, a
+   #+END_EXAMPLE
+
+   If you want your program to handle different types differently, you must do explicit type checking. The most common way to check the type of an object is to call a type predicate function. Emacs has a type predicate for each type, as well as some predicates for combinations of types.
+
+   如果希望程序以不同方式处理不同类型，则必须进行显式类型检查。检查对象类型的最常用方法是调用类型谓词函数。每种类型 Emacs 都有一个类型谓词，以及一些类型组合的谓词。
+
+   A type predicate function takes one argument; it returns t if the argument belongs to the appropriate type, and nil otherwise. Following a general Lisp convention for predicate functions, most type predicates' names end with ‘p’.
+
+   类型谓词函数接受一个参数; 如果参数属于适当的类型，则返回 t，否则返回 nil。遵循谓词函数的一般 Lisp 约定，大多数类型谓词的名称以'p'结尾。
+
+   Here is an example which uses the predicates listp to check for a list and symbolp to check for a symbol.
+
+   下面是一个使用谓词 listp 检查列表和 symbolp 来检查符号的示例。
+
+   #+BEGIN_SRC elisp
+     (defun add-on (x)
+       (cond ((symbolp x)
+              ;; If X is a symbol, put it on LIST.
+              (setq list (cons x list)))
+             ((listp x)
+              ;; If X is a list, add its elements to LIST.
+              (setq list (append x list)))
+             (t
+              ;; We handle only symbols and lists.
+              (error "Invalid argument %s in add-on" x))))
+   #+END_SRC
+
+   Here is a table of predefined type predicates, in alphabetical order, with references to further information.
+
+   下面是按字母顺序排列的预定义类型谓词表，其中包含对更多信息的引用。
+   (译者注：省略，参见[[https://www.gnu.org/software/emacs/manual/html_node/elisp/Type-Predicates.html#Type-Predicates][原文]])
+
+   The most general way to check the type of an object is to call the function type-of. Recall that each object belongs to one and only one primitive type; type-of tells you which one (see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types][Lisp Data Types]]). But type-of knows nothing about non-primitive types. In most cases, it is more convenient to use type predicates than type-of.
+
+   检查对象类型的最常用方法是调用函数 type-of。回想一下，每个对象属于一种且只有一种基本类型; type-of 告诉你哪一个（参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lisp-Data-Types.html#Lisp-Data-Types][Lisp Data Types]]）。 但是 type-of 对非原始类型一无所知。 在大多数情况下，使用类型谓词比使用 type-of 更方便。
+
+   + Function: type-of object
+
+     This function returns a symbol naming the primitive type of object. The value is one of the symbols bool-vector, buffer, char-table, compiled-function, condition-variable, cons, finalizer, float, font-entity, font-object, font-spec, frame, hash-table, integer, marker, mutex, overlay, process, string, subr, symbol, thread, vector, window, or window-configuration. However, if object is a record, the type specified by its first slot is returned; Records.
+
+     此函数返回指定对象的基本类型的符号。 该值是下列符号之一：bool-vector, buffer, char-table, compiled-function, condition-variable, cons, finalizer, float, font-entity, font-object, font-spec, frame, hash-table, integer, marker, mutex, overlay, process, string, subr, symbol, thread, vector, window, or window-configuration 但是，如果 object 是 record，则返回其第一个 slot 指定的类型；
+
+     #+BEGIN_EXAMPLE
+          (type-of 1)
+               ⇒ integer
+          (type-of 'nil)
+               ⇒ symbol
+          (type-of '())    ; () is nil.
+               ⇒ symbol
+          (type-of '(x))
+               ⇒ cons
+          (type-of (record 'foo))
+               ⇒ foo
+
+     #+END_EXAMPLE
+
+** 2.7 Equality Predicates
+
+   Here we describe functions that test for equality between two objects. Other functions test equality of contents between objects of specific types, e.g., strings. For these predicates, see the appropriate chapter describing the data type.
+
+   此处描述测试两个对象之间相等性的函数。其他函数测试特定类型的对象（例如字符串）之间的内容的相等性。 对于这些谓词，请参阅描述数据类型的相应章节。
+
+   + Function: eq object1 object2
+
+     This function returns t if object1 and object2 are the same object, and nil otherwise.
+
+     如果 object1 和 object2 是同一个对象，则此函数返回 t，否则返回 nil。
+
+     If object1 and object2 are integers with the same value, they are considered to be the same object (i.e., eq returns t). If object1 and object2 are symbols with the same name, they are normally the same object—but see [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols][Creating Symbols]] for exceptions. For other types (e.g., lists, vectors, strings), two arguments with the same contents or elements are not necessarily eq to each other: they are eq only if they are the same object, meaning that a change in the contents of one will be reflected by the same change in the contents of the other.
+
+     如果 object1 和 object2 是具有相同值的整数，则它们被认为是同一个对象（即，eq 返回 t）。 如果 object1 和 object2 是具有相同名称的符号，则它们通常是相同的对象 - 但请参阅 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols][Creating Symbols]] 了解异常。 对于其他类型（例如，列表，向量，字符串），具有相同内容或元素的两个参数不一定彼此相等：只有当它们是同一个对象时它们才是 eq，这意味着更改一个的内容，对方内容的相同出现相同的变化。
+
+     #+BEGIN_EXAMPLE
+          (eq 'foo 'foo)
+               ⇒ t
+
+          (eq 456 456)
+               ⇒ t
+
+          (eq "asdf" "asdf")
+               ⇒ nil
+
+          (eq "" "")
+               ⇒ t
+          ;; This exception occurs because Emacs Lisp
+          ;; makes just one multibyte empty string, to save space.
+
+          (eq '(1 (2 (3))) '(1 (2 (3))))
+               ⇒ nil
+
+          (setq foo '(1 (2 (3))))
+               ⇒ (1 (2 (3)))
+          (eq foo foo)
+               ⇒ t
+          (eq foo '(1 (2 (3))))
+               ⇒ nil
+
+          (eq [(1 2) 3] [(1 2) 3])
+               ⇒ nil
+
+          (eq (point-marker) (point-marker))
+               ⇒ nil
+     #+END_EXAMPLE
+
+     The make-symbol function returns an uninterned symbol, distinct from the symbol that is used if you write the name in a Lisp expression. Distinct symbols with the same name are not eq. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols][Creating Symbols]].
+
+     make-symbol 函数返回一个未处理的符号，与在 Lisp 表达式中写入名称时使用的符号不同。 具有相同名称的不同符号不是 eq。请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#Creating-Symbols][Creating Symbols]]。
+
+     #+BEGIN_EXAMPLE
+          (eq (make-symbol "foo") 'foo)
+               ⇒ nil
+     #+END_EXAMPLE
+
+   + Function: equal object1 object2
+
+     This function returns t if object1 and object2 have equal components, and nil otherwise. Whereas eq tests if its arguments are the same object, equal looks inside nonidentical arguments to see if their elements or contents are the same. So, if two objects are eq, they are equal, but the converse is not always true.
+
+     如果 object1 和 object2 具有相等的组件，则此函数返回 t，否则返回 nil。 虽然 eq 测试它的参数是否是同一个对象，但是 equal 在不同的参数内部查看它们的元素或内容是否相同。 因此，如果两个对象是 eq，它们是相等的，但反过来并不总是正确的。
+
+     #+BEGIN_EXAMPLE
+          (equal 'foo 'foo)
+               ⇒ t
+
+          (equal 456 456)
+               ⇒ t
+
+          (equal "asdf" "asdf")
+               ⇒ t
+          (eq "asdf" "asdf")
+               ⇒ nil
+
+          (equal '(1 (2 (3))) '(1 (2 (3))))
+               ⇒ t
+          (eq '(1 (2 (3))) '(1 (2 (3))))
+               ⇒ nil
+
+          (equal [(1 2) 3] [(1 2) 3])
+               ⇒ t
+          (eq [(1 2) 3] [(1 2) 3])
+               ⇒ nil
+
+          (equal (point-marker) (point-marker))
+               ⇒ t
+
+          (eq (point-marker) (point-marker))
+               ⇒ nil
+     #+END_EXAMPLE
+
+     Comparison of strings is case-sensitive, but does not take account of text properties—it compares only the characters in the strings. See [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html#Text-Properties][Text Properties]]. Use equal-including-properties to also compare text properties. For technical reasons, a unibyte string and a multibyte string are equal if and only if they contain the same sequence of character codes and all these codes are in the range 0 through 127 (ASCII).
+
+     字符串的比较区分大小写，但不考虑文本属性 - 它只比较字符串中的字符。请参见 [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html#Text-Properties][Text Properties]]。使用 equal-including-properties 也可以比较文本属性。由于技术原因，unibyte 字符串和多字节字符串是相等的，当且仅当它们包含相同的字符代码序列且所有这些代码都在 0 到 127（ASCII）范围内时。
+
+     #+BEGIN_EXAMPLE
+          (equal "asdf" "ASDF")
+               ⇒ nil
+     #+END_EXAMPLE
+
+     However, two distinct buffers are never considered equal, even if their textual contents are the same.
+
+     但是，即使两个不同的缓冲区的文本内容相同，也不会认为它们是相等的。
+
+     The test for equality is implemented recursively; for example, given two cons cells x and y, (equal x y) returns t if and only if both the expressions below return t:
+
+     对等式的测试是递归实现的; 例如，给定两个 cons cell x 和 y，（equal x y）返回 t 当且仅当下面的两个表达式返回 t 时：
+
+     #+BEGIN_SRC elisp
+     (equal (car x) (car y))
+     (equal (cdr x) (cdr y))
+     #+END_SRC
+
+     Because of this recursive method, circular lists may therefore cause infinite recursion (leading to an error).
+
+     由于这种递归方法，循环列表因此可能导致无限递归（导致错误）。
+
+
+   + Function: equal-including-properties object1 object2
+
+     This function behaves like equal in all cases but also requires that for two strings to be equal, they have the same text properties.
+
+     此函数在所有情况下的行为都相同，但也要求两个字符串相等，它们具有相同的文本属性。
+
+     #+BEGIN_EXAMPLE
+          (equal "asdf" (propertize "asdf" 'asdf t))
+               ⇒ t
+          (equal-including-properties "asdf"
+                                      (propertize "asdf" 'asdf t))
+               ⇒ nil
+     #+END_EXAMPLE
 
 
 
